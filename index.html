@@ -447,8 +447,12 @@ async function bajaArticulo(id){
 function renderProductosVenta(){
   const el=document.getElementById('productosVenta'); if(!el) return;
   const s=(document.getElementById('buscarVenta')?.value||'').toLowerCase();
-  const list=articulos.filter(a=>(!a.estatus || a.estatus==='Activo') && (!s || `${a.codigo} ${a.nombre} ${a.descripcion}`.toLowerCase().includes(s)));
-  el.innerHTML=list.map(a=>`<div class="product-line"><div><b>${a.nombre}</b><div class="meta">${a.codigo||'-'} | Stock: ${a.inventario_piezas}</div></div><div><b>${money(a.precio_venta)}</b></div><button class="small" ${a.inventario_piezas<=0?'disabled':''} onclick="addCart('${a.id}')">Agregar</button></div>`).join('') || 'No hay artículos activos.';
+  const list=articulos.filter(a=>
+    (!a.estatus || a.estatus==='Activo') &&
+    Number(a.inventario_piezas||0)>0 &&
+    (!s || `${a.codigo} ${a.nombre} ${a.descripcion}`.toLowerCase().includes(s))
+  );
+  el.innerHTML=list.map(a=>`<div class="product-line"><div><b>${a.nombre}</b><div class="meta">${a.codigo||'-'} | Stock: ${a.inventario_piezas}</div></div><div><b>${money(a.precio_venta)}</b></div><button class="small" ${a.inventario_piezas<=0?'disabled':''} onclick="addCart('${a.id}')">Agregar</button></div>`).join('') || 'No hay artículos con inventario disponible en esta sucursal.';
 }
 function addCart(id){
   const a=articulos.find(x=>x.id===id); if(!a || a.inventario_piezas<=0) return;
